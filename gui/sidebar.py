@@ -1,33 +1,71 @@
 import customtkinter as ctk
+import os
+from pathlib import Path
 from gui.affichage_fichiers import AffichageFichiers
 from gestion.favoris import ajouter_favori, retirer_favori, lister_favoris
 
 class Sidebar(ctk.CTkFrame):
     def __init__(self, master, affichage, **kwargs):
         super().__init__(master, bg_color="white", width=200, corner_radius=0, **kwargs)
-        self.affichage=affichage
+        self.affichage = affichage
         self.create_widgets()
 
     def create_widgets(self):
-        # Bouton pour afficher les fichiers récents
-        self.btn_recents = ctk.CTkButton(self, text="📁 Recents", fg_color="lightgrey", corner_radius=0, text_color="black",command=self.afficher_recents)
-        self.btn_recents.pack(fill="x", padx=10, pady=5)
+        # Style général des boutons
+        self.button_style = {
+            "fg_color": "lightgrey",
+            "corner_radius": 0,
+            "text_color": "black",
+            "hover_color": "#d3d3d3"  # Couleur au survol 
+        }
 
-        # Bouton pour afficher les favoris
-        self.btn_favorites = ctk.CTkButton(self, text="⭐ Favorites", fg_color="lightgrey", corner_radius=0, text_color="black",command=self.afficher_favorites)
-        self.btn_favorites.pack(fill="x", padx=10, pady=5)
+        # Création des boutons avec texte aligné à gauche
+        self.btn_recents = self.create_sticky_button("📁 Recents", self.afficher_recents)
+        self.btn_favorites = self.create_sticky_button("⭐ Favorites", self.afficher_favorites)
+        self.btn_computer = self.create_sticky_button("💻 Computer", self.afficher_computer)
+        self.btn_documents = self.create_sticky_button("📄 Documents", self.afficher_documents)
+        self.btn_photos = self.create_sticky_button("🌄 Photos", self.afficher_photos)
+        self.btn_videos = self.create_sticky_button("🎥 Videos", self.afficher_videos)
+        self.btn_audios = self.create_sticky_button("🎵 Audios", self.afficher_audios)
 
-        # Bouton pour afficher la vue "Computer"
-        self.btn_computer = ctk.CTkButton(self, text="💻 Computer", fg_color="lightgrey", corner_radius=0, text_color="black",command=self.afficher_computer)
-        self.btn_computer.pack(fill="x", padx=10, pady=5)
+    def create_sticky_button(self, text, command):
+        """Crée un bouton avec un effet sticky au survol et au clic, et un texte aligné à gauche."""
+        btn = ctk.CTkButton(self, text=text, **self.button_style, command=command, anchor="w")  # Texte à gauche
+        btn.pack(fill="x", padx=10, pady=5)
+
+        # Ajout des effets sticky
+        btn.bind("<Enter>", lambda e: btn.configure(fg_color="#bfbfbf"))  # Survol
+        btn.bind("<Leave>", lambda e: btn.configure(fg_color="lightgrey"))  # Quitte le survol
+        btn.bind("<ButtonPress-1>", lambda e: btn.configure(fg_color="#a9a9a9"))  # Clic
+        btn.bind("<ButtonRelease-1>", lambda e: btn.configure(fg_color="#bfbfbf"))  # Relâche le clic
+
+        return btn
 
     def afficher_recents(self):
         self.affichage.afficher_recents()
 
     def afficher_favorites(self):
         self.affichage.afficher_favoris()
-        # Vous pouvez appeler la fonction lister_favoris du module gestion/favoris ici
 
     def afficher_computer(self):
-         self.affichage.ouvrir_dossiernavc("C:/")
-        # Affichage de l'ensemble des disques ou d'une vue globale
+        self.affichage.ouvrir_dossiernavc("C:/")
+
+    def afficher_documents(self):
+        chemin = Path.home() / "Documents"
+        if chemin.exists():
+            self.affichage.ouvrir_dossiernavc(str(chemin))
+
+    def afficher_photos(self):
+        chemin = Path.home() / "Pictures"
+        if chemin.exists():
+            self.affichage.ouvrir_dossiernavc(str(chemin))
+
+    def afficher_videos(self):
+        chemin = Path.home() / "Videos"
+        if chemin.exists():
+            self.affichage.ouvrir_dossiernavc(str(chemin))
+
+    def afficher_audios(self):
+        chemin = Path.home() / "Music"
+        if chemin.exists():
+            self.affichage.ouvrir_dossiernavc(str(chemin))
