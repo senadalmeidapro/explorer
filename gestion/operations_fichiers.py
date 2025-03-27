@@ -1,12 +1,15 @@
 import os
+import traceback
 import sys
 import subprocess
 import shutil
 import customtkinter as ctk
-from gestion.favoris import add_recents, ajouter_favori, send_recent
+import threading
 import time
+from gestion.favoris import add_recents, ajouter_favori, send_recent
 
-# Fonctions de dialogue personnalisées avec customtkinter
+# Drapeaux globaux pour annuler l'opération
+cancel_copy = threading.Event()
 
 def center_window(win, width, height):
     win.update_idletasks()
@@ -19,7 +22,6 @@ def center_window(win, width, height):
 def custom_show_error(title, message):
     dialog = ctk.CTkToplevel()
     dialog.title(title)
-    # Définir la taille souhaitée pour la fenêtre de dialogue
     width, height = 300, 150
     center_window(dialog, width, height)
     label = ctk.CTkLabel(dialog, text=message, wraplength=280)
@@ -69,8 +71,9 @@ def custom_ask_string(title, prompt):
     dialog = ctk.CTkInputDialog(text=prompt, title=title)
     return dialog.get_input()
 
-
-# 🔹 Gestion des fichiers et dossiers
+##############################################################################
+# Fonctions de gestion des opérations sur fichiers/dossiers
+##############################################################################
 
 def creer_fichier(dir, update_barre_callback=None):
     nom_fichier = custom_ask_string("Créer un fichier", "Nom du fichier à créer :")
@@ -88,18 +91,18 @@ def creer_fichier(dir, update_barre_callback=None):
                 if ose.errno == 13:
                     if attempt == 0:
                         retry = custom_ask_yes_no("Autorisation requise", 
-                                                  f"Accès refusé pour créer le fichier.\nVoulez-vous réessayer ?")
+                                                  "Accès refusé pour créer le fichier.\nVoulez-vous réessayer ?")
                         if not retry:
                             return
                         attempt += 1
                     else:
-                        custom_show_error("Accès refusé", f"Accès toujours refusé pour créer le fichier")
+                        custom_show_error("Accès refusé", "Accès toujours refusé pour créer le fichier")
                         return
                 else:
-                    custom_show_error("Erreur", f"Impossible de créer le fichier")
+                    custom_show_error("Erreur", "Impossible de créer le fichier")
                     return
-            except Exception as e:
-                custom_show_error("Erreur", f"Impossible de créer le fichier")
+            except Exception:
+                custom_show_error("Erreur", "Impossible de créer le fichier")
                 return
 
 def creer_dossier(dir, update_barre_callback=None):
@@ -117,27 +120,26 @@ def creer_dossier(dir, update_barre_callback=None):
                 if ose.errno == 13:
                     if attempt == 0:
                         retry = custom_ask_yes_no("Autorisation requise", 
-                                                  f"Accès refusé pour créer le dossier.\nVoulez-vous réessayer ?")
+                                                  "Accès refusé pour créer le dossier.\nVoulez-vous réessayer ?")
                         if not retry:
                             return
                         attempt += 1
                     else:
-                        custom_show_error("Accès refusé", f"Accès toujours refusé pour créer le dossier")
+                        custom_show_error("Accès refusé", "Accès toujours refusé pour créer le dossier")
                         return
                 else:
-                    custom_show_error("Erreur", f"Impossible de créer le dossier")
+                    custom_show_error("Erreur", "Impossible de créer le dossier")
                     return
-            except Exception as e:
-                custom_show_error("Erreur", f"Impossible de créer le dossier")
+            except Exception:
+                custom_show_error("Erreur", "Impossible de créer le dossier")
                 return
 
 def ouvrir_element(nom, dir, affichage=None, update_barre_callback=None):
     """
     Ouvre un fichier ou un dossier.
     
-    Si c'est un dossier, l'affichage est mis à jour et le chemin est ajouté à l'historique.
-    Si c'est un fichier, il est ouvert avec l'application par défaut du système.
-    En cas d'erreur d'accès (PermissionError), l'utilisateur peut réessayer.
+    Si c'est un dossier, met à jour l'affichage et l'historique.
+    Si c'est un fichier, l'ouvre avec l'application par défaut.
     """
     chemin = os.path.join(dir, nom)
     if not os.path.exists(chemin):
@@ -148,7 +150,6 @@ def ouvrir_element(nom, dir, affichage=None, update_barre_callback=None):
     while attempt < 2:
         try:
             if os.path.isdir(chemin):
-                # Si c'est un dossier, on met à jour l'affichage et l'historique
                 if affichage:
                     affichage.chemin = chemin
                     affichage.afficher_contenu()
@@ -156,7 +157,6 @@ def ouvrir_element(nom, dir, affichage=None, update_barre_callback=None):
                 if update_barre_callback:
                     update_barre_callback(chemin)
             else:
-                # Si c'est un fichier, ouvrir avec l'application par défaut
                 if sys.platform.startswith("win"):
                     os.startfile(chemin)
                 elif sys.platform.startswith("darwin"):
@@ -168,7 +168,7 @@ def ouvrir_element(nom, dir, affichage=None, update_barre_callback=None):
             if ose.errno == 13:
                 if attempt == 0:
                     retry = custom_ask_yes_no("Autorisation requise", 
-                                               f"Accès refusé pour ouvrir l'élément.\nVoulez-vous réessayer ?")
+                                               "Accès refusé pour ouvrir l'élément.\nVoulez-vous réessayer ?")
                     if not retry:
                         return
                     attempt += 1
@@ -178,10 +178,9 @@ def ouvrir_element(nom, dir, affichage=None, update_barre_callback=None):
             else:
                 custom_show_error("Erreur", "Erreur lors de l'ouverture.")
                 return
-        except Exception as e:
+        except Exception:
             custom_show_error("Erreur", "Erreur lors de l'ouverture.")
             return
-
 
 def renommer_element(nom, dir):
     chemin = os.path.join(dir, nom)
@@ -200,18 +199,18 @@ def renommer_element(nom, dir):
                 if ose.errno == 13:
                     if attempt == 0:
                         retry = custom_ask_yes_no("Autorisation requise", 
-                                                  f"Accès refusé lors du renommage.\nVoulez-vous réessayer ?")
+                                                  "Accès refusé lors du renommage.\nVoulez-vous réessayer ?")
                         if not retry:
                             return
                         attempt += 1
                     else:
-                        custom_show_error("Accès refusé", f"Accès toujours refusé lors du renommage")
+                        custom_show_error("Accès refusé", "Accès toujours refusé lors du renommage")
                         return
                 else:
-                    custom_show_error("Erreur", f"Erreur lors du renommage")
+                    custom_show_error("Erreur", "Erreur lors du renommage")
                     return
-            except Exception as e:
-                custom_show_error("Erreur", f"Erreur lors du renommage")
+            except Exception:
+                custom_show_error("Erreur", "Erreur lors du renommage")
                 return
 
 def supprimer_element(nom, dir):
@@ -233,22 +232,22 @@ def supprimer_element(nom, dir):
                 if ose.errno == 13:
                     if attempt == 0:
                         retry = custom_ask_yes_no("Autorisation requise", 
-                                                  f"Accès refusé lors de la suppression.\nVoulez-vous réessayer ?")
+                                                  "Accès refusé lors de la suppression.\nVoulez-vous réessayer ?")
                         if not retry:
                             return
                         attempt += 1
                     else:
-                        custom_show_error("Accès refusé", f"Accès toujours refusé lors de la suppression")
+                        custom_show_error("Accès refusé", "Accès toujours refusé lors de la suppression")
                         return
                 else:
-                    custom_show_error("Erreur", f"Erreur lors de la suppression")
+                    custom_show_error("Erreur", "Erreur lors de la suppression")
                     return
-            except Exception as e:
-                custom_show_error("Erreur", f"Erreur lors de la suppression")
+            except Exception:
+                custom_show_error("Erreur", "Erreur lors de la suppression")
                 return
 
 def ajouter_aux_favoris(nom, dir):
-    """Ajoute un fichier ou un dossier aux favoris"""
+    """Ajoute un fichier ou un dossier aux favoris."""
     chemin = os.path.join(dir, nom)
     if not os.path.exists(chemin):
         custom_show_error("Erreur", f"L'élément '{chemin}' n'existe pas.")
@@ -256,10 +255,14 @@ def ajouter_aux_favoris(nom, dir):
     try:
         ajouter_favori(chemin)
         custom_show_info("Favoris", f"'{nom}' a été ajouté aux favoris.")
-    except Exception as e:
-        custom_show_error("Erreur", f"Erreur lors de l'ajout aux favoris")
+    except Exception:
+        custom_show_error("Erreur", "Erreur lors de l'ajout aux favoris")
 
-# Variable pour stocker l'élément à copier ou couper
+##############################################################################
+# Fonctions de copier/couper/coller avec suivi de progression
+##############################################################################
+
+# Variables globales pour stocker l'élément à copier ou couper
 chemin_copie = None
 chemin_coupe = None
 
@@ -277,18 +280,12 @@ def couper_element(nom, dir):
     chemin_copie = None  # On s'assure qu'on ne copie pas en même temps
     custom_show_info("Couper", f"'{nom}' est prêt à être déplacé.")
 
-import threading
-
-# Drapeaux globaux pour annuler l'opération
-cancel_copy = threading.Event()
-
 class ProgressBarWindow(ctk.CTkToplevel):
     def __init__(self, master, title="Progression", **kwargs):
         super().__init__(master, **kwargs)
         self.title(title)
         self.geometry("400x100")
         self.resizable(False, False)
-        # Centrer la fenêtre si besoin (vous pouvez ajouter une fonction center_window)
         self.progress = ctk.CTkProgressBar(self, mode="determinate")
         self.progress.set(0)
         self.progress.pack(padx=20, pady=10, fill="x")
@@ -300,29 +297,92 @@ class ProgressBarWindow(ctk.CTkToplevel):
         cancel_copy.set()
         self.destroy()
 
-def copy_file_with_progress(src, dest, progress_win, chunk_size=1024*1024):
+
+def copy_file_with_progress(src, dest, progress_win, cancel_copy, chunk_size=1024*1024):
     """
-    Copie le fichier src vers dest par blocs, 
-    met à jour la barre de progression et surveille l'annulation.
+    Copie le fichier src vers dest par blocs, met à jour la barre de progression,
+    et surveille l'annulation.
     """
-    total_size = os.path.getsize(src)
-    copied = 0
     try:
+        total_size = os.path.getsize(src)
+        copied = 0
+
         with open(src, "rb") as fsrc, open(dest, "wb") as fdest:
             while True:
                 if cancel_copy.is_set():
                     raise Exception("Copie annulée par l'utilisateur.")
+
                 chunk = fsrc.read(chunk_size)
                 if not chunk:
                     break
                 fdest.write(chunk)
                 copied += len(chunk)
-                progress = copied / total_size
-                progress_win.progress.set(progress)
-                progress_win.update_idletasks()
+
+                if total_size > 0:
+                    progress = copied / total_size
+                    if progress_win.winfo_exists():
+                        progress_win.progress.set(progress)
+                        progress_win.update_idletasks()
+
         return True
     except Exception as e:
-        return e
+        print("Erreur lors de la copie du fichier :", e)
+        print(traceback.format_exc())  # Affiche la trace complète de l'erreur
+        return False
+
+def copy_folder_with_progress(src, dest, progress_win, cancel_copy, chunk_size=1024*1024):
+    """
+    Copie récursivement un dossier src vers dest en parcourant tous les fichiers,
+    met à jour la barre de progression et surveille l'annulation.
+    """
+    try:
+        total_size = 0
+        copied_size = 0
+
+        # Calculer la taille totale des fichiers dans le dossier
+        for root, _, files in os.walk(src):
+            for file in files:
+                file_path = os.path.join(root, file)
+                if os.path.exists(file_path):
+                    total_size += os.path.getsize(file_path)
+
+        if total_size == 0:
+            raise Exception("Le dossier source est vide ou inaccessible.")
+
+        # Créer le dossier destination
+        os.makedirs(dest, exist_ok=True)
+
+        for root, _, files in os.walk(src):
+            rel_path = os.path.relpath(root, src)
+            dest_dir = os.path.join(dest, rel_path)
+            os.makedirs(dest_dir, exist_ok=True)
+
+            for file in files:
+                src_file = os.path.join(root, file)
+                dest_file = os.path.join(dest_dir, file)
+
+                with open(src_file, "rb") as fsrc, open(dest_file, "wb") as fdest:
+                    while True:
+                        if cancel_copy.is_set():
+                            raise Exception("Copie annulée par l'utilisateur.")
+
+                        chunk = fsrc.read(chunk_size)
+                        if not chunk:
+                            break
+                        fdest.write(chunk)
+                        copied_size += len(chunk)
+
+                        if total_size > 0:
+                            progress = copied_size / total_size
+                            if progress_win.winfo_exists():
+                                progress_win.progress.set(progress)
+                                progress_win.update_idletasks()
+
+        return True
+    except Exception as e:
+        print("Erreur lors de la copie du dossier :", e)
+        print(traceback.format_exc())  # Affiche la trace complète de l'erreur
+        return False
 
 def coller_element():
     """Colle l'élément copié ou coupé dans la destination récente, avec suivi de progression."""
@@ -331,8 +391,7 @@ def coller_element():
         custom_show_error("Erreur", "Aucune destination disponible.")
         return
 
-    destination = destinations[-1]  # Dernier élément récent
-    # Si la destination est un fichier, prendre son dossier parent
+    destination = destinations[-1]
     if os.path.isfile(destination):
         destination = os.path.dirname(destination)
     if not os.path.isdir(destination):
@@ -341,7 +400,6 @@ def coller_element():
 
     global chemin_copie, chemin_coupe
 
-    # Fonction utilitaire pour générer un nom unique en cas de conflit
     def get_unique_name(src, dest_dir):
         base, ext = os.path.splitext(os.path.basename(src))
         compteur = 1
@@ -353,7 +411,6 @@ def coller_element():
             nouveau_chemin = os.path.join(dest_dir, nouveau_nom)
         return nouveau_chemin
 
-    # Mode copie avec progression
     if chemin_copie:
         try:
             cible = os.path.join(destination, os.path.basename(chemin_copie))
@@ -364,12 +421,18 @@ def coller_element():
                 )
                 if not remplacer:
                     cible = get_unique_name(chemin_copie, destination)
-            # Si c'est un dossier, utiliser copytree (sans barre de progression)
+            # Si c'est un dossier, utiliser la fonction de copie avec progression
             if os.path.isdir(chemin_copie):
-                shutil.copytree(chemin_copie, cible)
-                custom_show_info("Collage réussi", f"'{os.path.basename(chemin_copie)}' a été copié dans '{destination}'.")
+                progress_win = ProgressBarWindow(None, title="Copie en cours")
+                def copy_task():
+                    result = copy_folder_with_progress(chemin_copie, cible, progress_win)
+                    progress_win.destroy()
+                    if result is True:
+                        custom_show_info("Collage réussi", f"'{os.path.basename(chemin_copie)}' a été copié dans '{destination}'.")
+                    else:
+                        custom_show_error("Erreur", f"Erreur lors de la copie : {result}")
+                threading.Thread(target=copy_task, daemon=True).start()
             else:
-                # Pour un fichier, utiliser la copie avec progression
                 progress_win = ProgressBarWindow(None, title="Copie en cours")
                 def copy_task():
                     result = copy_file_with_progress(chemin_copie, cible, progress_win)
@@ -381,14 +444,11 @@ def coller_element():
                 threading.Thread(target=copy_task, daemon=True).start()
         except PermissionError as pe:
             custom_show_error("Accès refusé", f"Accès refusé pour copier l'élément : {pe}")
-        except FileExistsError:
-            custom_show_error("Erreur", f"Un élément portant le même nom existe déjà dans '{destination}'.")
         except Exception as e:
             custom_show_error("Erreur", f"Erreur lors de la copie : {e}")
         finally:
             chemin_copie = None
 
-    # Mode déplacement
     elif chemin_coupe:
         try:
             cible = os.path.join(destination, os.path.basename(chemin_coupe))
@@ -401,7 +461,7 @@ def coller_element():
                     cible = get_unique_name(chemin_coupe, destination)
             shutil.move(chemin_coupe, cible)
             custom_show_info("Déplacement réussi", f"'{os.path.basename(chemin_coupe)}' a été déplacé vers '{destination}'.")
-            chemin_coupe = cible  # Mise à jour du chemin si nécessaire
+            chemin_coupe = cible
         except PermissionError as pe:
             custom_show_error("Accès refusé", f"Accès refusé pour déplacer l'élément : {pe}")
         except FileExistsError:
