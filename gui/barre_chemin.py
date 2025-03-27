@@ -67,12 +67,12 @@ class BarreChemin(ctk.CTkFrame):
             "Autre"         # Afficher les fichiers qui ne sont ni images, vidéos, audios, ni texte
         ]
         
-        self.btn1= ctk.CTkButton(self.frame, text="📂",width=50,)
-        self.btn2= ctk.CTkButton(self.frame, text="📄",width=50,)
-        self.btn3= ctk.CTkButton(self.frame, text="✂️",width=50,)
-        self.btn4= ctk.CTkButton(self.frame, text="📋",width=50,)
-        self.btn5= ctk.CTkButton(self.frame, text="🗑️",width=50,)
-        self.btn8= ctk.CTkButton(self.frame, text="🗑️Rennomer",width=50,)
+        self.btn1= ctk.CTkButton(self.frame, text="📂",width=50, fg_color="gray")
+        self.btn2= ctk.CTkButton(self.frame, text="📄",width=50, fg_color="gray")
+        self.btn3= ctk.CTkButton(self.frame, text="✂️",width=50, fg_color="gray")
+        self.btn4= ctk.CTkButton(self.frame, text="📋",width=50, fg_color="gray")
+        self.btn5= ctk.CTkButton(self.frame, text="🗑️",width=50, fg_color="gray")
+        self.btn8= ctk.CTkButton(self.frame, text="🗑️Rennomer",width=50, fg_color="gray")
         self.btn6= ctk.CTkLabel(self.frame, text="Trier par")
         self.btn7= ctk.CTkComboBox(self.frame, values=op, command= self.on_combobox_select)
         self.btn1.grid(row=0 ,column=0,padx=1)
