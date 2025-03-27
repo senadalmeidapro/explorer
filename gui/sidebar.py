@@ -20,6 +20,8 @@ class Sidebar(ctk.CTkFrame):
         self.btn_recents = self.create_sticky_button("📁 Recents", self.afficher_recents)
         self.btn_favorites = self.create_sticky_button("⭐ Favorites", self.afficher_favorites)
         self.btn_computer = self.create_sticky_button("💻 Computer", self.afficher_computer)
+        self.btn_bureau = self.create_sticky_button("📂 Bureau", self.afficher_bureau)
+        self.btn_telechargements = self.create_sticky_button("⬇️ Téléchargements", self.afficher_telechargements)
         self.btn_documents = self.create_sticky_button("📄 Documents", self.afficher_documents)
         self.btn_photos = self.create_sticky_button("🌄 Photos", self.afficher_photos)
         self.btn_videos = self.create_sticky_button("🎥 Videos", self.afficher_videos)
@@ -46,6 +48,16 @@ class Sidebar(ctk.CTkFrame):
 
     def afficher_computer(self):
         self.affichage.ouvrir_dossiernavc("C:/")
+
+    def afficher_bureau(self):
+        chemin = Path.home() / "Desktop"
+        if chemin.exists():
+            self.affichage.ouvrir_dossiernavc(str(chemin))
+    
+    def afficher_telechargements(self):
+        chemin = Path.home() / "Downloads"
+        if chemin.exists():
+            self.affichage.ouvrir_dossiernavc(str(chemin))
 
     def afficher_documents(self):
         chemin = Path.home() / "Documents"
