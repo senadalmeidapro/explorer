@@ -130,3 +130,15 @@ Pour installer et lancer l'application :
 1. Clonez ce dépôt :
    ```bash
    git clone https://github.com/votre-utilisateur/explorateur-fichiers.git
+
+2. Accédez au répertoire du projet :
+   ```bash
+   cd explorateur-fichiers
+  
+3. Installez les dépendances nécessaires :
+    ```bash
+   pip install -r requirements.txt
+  
+4. Lancez l'application :
+   ```bash
+   python main.py
