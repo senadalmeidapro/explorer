@@ -5,7 +5,6 @@ import subprocess
 import shutil
 import customtkinter as ctk
 import threading
-import time
 from gestion.favoris import add_recents, ajouter_favori, send_recent
 
 # Drapeaux globaux pour annuler l'opération
