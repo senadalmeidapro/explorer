@@ -1,4 +1,5 @@
-# Explorateur de Fichiers par D'ALMEIDA Gédéon, SOSSOU Daryl et SOBOUR
+# Explorateur de Fichiers 
+## Par D'ALMEIDA Gédéon, SOSSOU Daryl et SOBOUR
 
 **Explorateur de Fichiers** est une application graphique développée en Python par utilisant `customtkinter`. Cette application permet aux utilisateurs de naviguer, gérer et manipuler leurs fichiers et répertoires via une interface conviviale. Elle inclut des fonctionnalités pour copier, déplacer, renommer, supprimer, et gérer des favoris ainsi que l'historique de navigation.
 
