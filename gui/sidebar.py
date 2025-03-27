@@ -4,7 +4,7 @@ from gestion.favoris import ajouter_favori, retirer_favori, lister_favoris
 
 class Sidebar(ctk.CTkFrame):
     def __init__(self, master, affichage, **kwargs):
-        super().__init__(master, bg_color="white", width=200, **kwargs)
+        super().__init__(master, bg_color="white", width=200, corner_radius=0, **kwargs)
         self.affichage=affichage
         self.create_widgets()
 

@@ -14,7 +14,7 @@ class FenetrePrincipale:
         ctk.set_appearance_mode("Light")  # "System", "Dark", "Light"
         
         # Création du frame principal qui couvre toute la fenêtre
-        self.main_frame = ctk.CTkFrame(self.master)
+        self.main_frame = ctk.CTkFrame(self.master, corner_radius=0)
         self.main_frame.grid(row=0, column=0, sticky="nsew")
         
         # Assurer que le frame principal s'étend avec la fenêtre

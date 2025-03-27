@@ -10,7 +10,7 @@ class BarreChemin(ctk.CTkFrame):
         :param master: le widget parent
         :param affichage: instance d'AffichageFichiers qui gère l'affichage et possède l'attribut 'chemin'
         """
-        super().__init__(master, bg_color="white", height=40, **kwargs)
+        super().__init__(master, bg_color="white", height=40,corner_radius=0, **kwargs)
         self.affichage = affichage  # Maintenant, c'est une instance !
         self.chemin_actuel = tk.StringVar(value="C:/Users")
         self.on_change = None  # Callback défini par le parent pour valider le changement de chemin
@@ -112,23 +112,23 @@ class BarreChemin(ctk.CTkFrame):
         search_thread.start()
     
     def copi(self, event=None):
-        self.affichage.cop_el()
+        Thread(target=self.affichage.cop_el()).start()
         
     
     def coup(self, event=None):
-        self.affichage.coup_el()
+        Thread(target=self.affichage.coup_el()).start()
         
     
     def coll(self, event=None):
-        self.affichage.col_el()
+        Thread(target=self.affichage.col_el()).start()
         
     
     def new(self, event=None):
-        self.affichage.add_el()
+        Thread(target=self.affichage.add_el()).start()
         
     
     def sup(self, event=None):
-        self.affichage.sup_el()
+        Thread(target=self.affichage.sup_el()).start()
         
     
     def on_combobox_select(self, event=None):
