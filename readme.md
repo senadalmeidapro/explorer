@@ -1,6 +1,6 @@
-# Explorateur de Fichiers
+# Explorateur de Fichiers par D'ALMEIDA Gédéon, SOSSOU Daryl et SOBOUR
 
-**Explorateur de Fichiers** est une application graphique développée en Python utilisant `customtkinter`. Cette application permet aux utilisateurs de naviguer, gérer et manipuler leurs fichiers et répertoires via une interface conviviale. Elle inclut des fonctionnalités pour copier, déplacer, renommer, supprimer, et gérer des favoris ainsi que l'historique de navigation.
+**Explorateur de Fichiers** est une application graphique développée en Python par utilisant `customtkinter`. Cette application permet aux utilisateurs de naviguer, gérer et manipuler leurs fichiers et répertoires via une interface conviviale. Elle inclut des fonctionnalités pour copier, déplacer, renommer, supprimer, et gérer des favoris ainsi que l'historique de navigation.
 
 ## Fonctionnalités principales
 
@@ -116,7 +116,7 @@ L'application est divisée en plusieurs modules :
 | **Gestion de l'historique et des favoris** | Utilisation d'un `set` pour éviter les doublons et réinitialisation de l'index en cas d'ajout. |
 | **Affichage des boîtes de dialogue** | Centrage des boîtes de dialogue pour une meilleure visibilité. |
 
-## Améliorations futures
+## Améliorations futures que nous prévoyons
 
 1. **Persistance des favoris et de l'historique** : Sauvegarder les données dans un fichier JSON ou une base de données SQLite pour conserver les informations après fermeture de l'application.
 2. **Recherche avancée** : Ajouter des options de recherche par nom, type, taille ou date pour filtrer plus efficacement les fichiers.
