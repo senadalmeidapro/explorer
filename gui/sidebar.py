@@ -1,8 +1,5 @@
 import customtkinter as ctk
-import os
 from pathlib import Path
-from gui.affichage_fichiers import AffichageFichiers
-from gestion.favoris import ajouter_favori, retirer_favori, lister_favoris
 
 class Sidebar(ctk.CTkFrame):
     def __init__(self, master, affichage, **kwargs):

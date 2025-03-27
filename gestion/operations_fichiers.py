@@ -4,7 +4,6 @@ import subprocess
 import shutil
 import customtkinter as ctk
 from gestion.favoris import add_recents, ajouter_favori, send_recent
-import time
 
 # Fonctions de dialogue personnalisées avec customtkinter
 

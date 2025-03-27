@@ -1,6 +1,5 @@
 import customtkinter as ctk
 import tkinter as tk
-from gui.affichage_fichiers import AffichageFichiers
 from gestion.favoris import parcours
 from threading import Thread
 
