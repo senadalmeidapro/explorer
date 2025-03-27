@@ -12,7 +12,7 @@ class BarreChemin(ctk.CTkFrame):
         """
         super().__init__(master, bg_color="white", height=40, **kwargs)
         self.affichage = affichage  # Maintenant, c'est une instance !
-        self.chemin_actuel = tk.StringVar(value="C:/Users/senad/Documents")
+        self.chemin_actuel = tk.StringVar(value="C:/Users")
         self.on_change = None  # Callback défini par le parent pour valider le changement de chemin
         self.create_widgets()
         self.grid_columnconfigure(4, weight=1)  # La colonne 4 (entrée) prend toute la largeur restante

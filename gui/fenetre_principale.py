@@ -28,7 +28,7 @@ class FenetrePrincipale:
         self.main_frame.rowconfigure(1, weight=1)  # Affichage et sidebar prennent l'espace restant
         
         # Zone principale (ligne 1)
-        self.dir = "C:/Users/senad/Documents"
+        self.dir = "C:/Users"
         add_recents(self.dir)
         
         # Sidebar (colonne 0, prend toute la hauteur)
