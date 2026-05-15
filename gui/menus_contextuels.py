@@ -24,6 +24,11 @@ class MenusContextuels:
         self.menu.add_command(label="Retirer des favoris", command=self.retirer_des_favoris)
         self.menu.add_command(label="Lister les favoris", command=self.lister_favoris)
 
+    def _repertoire_cible(self):
+        if os.path.isdir(self.chemin_cible):
+            return self.chemin_cible
+        return os.path.dirname(self.chemin_cible)
+
     def lister_favoris(self):
         """Affiche la liste des éléments dans les favoris."""
         self.affichage.afficher_favoris()  # Appeler la méthode dans AffichageFichiers pour afficher les favoris dans l'interface
@@ -49,16 +54,14 @@ class MenusContextuels:
 
     def dossier(self):
         """Crée un nouveau dossier dans le répertoire sélectionné."""
-        chemin = os.path.join(os.path.basename(self.chemin_cible),
-                              os.path.dirname(self.chemin_cible))
-        creer_dossier(chemin)
+        callback = self.update_barre_callback if callable(self.update_barre_callback) else None
+        creer_dossier(self._repertoire_cible(), callback)
         self.rafraichir_callback()
 
     def fichier(self):
         """Crée un nouveau fichier dans le répertoire sélectionné."""
-        chemin = os.path.join(os.path.basename(self.chemin_cible),
-                              os.path.dirname(self.chemin_cible))
-        creer_fichier(chemin)
+        callback = self.update_barre_callback if callable(self.update_barre_callback) else None
+        creer_fichier(self._repertoire_cible(), callback)
         self.rafraichir_callback()
 
     def ajouter_aux_favoris(self):
@@ -72,9 +75,7 @@ class MenusContextuels:
         """Retire l'élément (dossier ou fichier) des favoris."""
         if self.chemin_cible in lister_favoris():
             retirer_favori(self.chemin_cible,)
-            if self.show:
+            if self.affichage and hasattr(self.affichage, "afficher_favoris"):
                 self.affichage.afficher_favoris()
-                
         else:
             pass
-

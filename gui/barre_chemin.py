@@ -1,7 +1,7 @@
 import customtkinter as ctk
 import tkinter as tk
-from gestion.favoris import parcours
-from threading import Thread
+from pathlib import Path
+from gestion.favoris import parcours, etat_parcours
 
 class BarreChemin(ctk.CTkFrame):
     def __init__(self, master, affichage, **kwargs):  # Ajout du paramètre affichage
@@ -11,7 +11,10 @@ class BarreChemin(ctk.CTkFrame):
         """
         super().__init__(master, bg_color="white", height=40,corner_radius=0, **kwargs)
         self.affichage = affichage  # Maintenant, c'est une instance !
-        self.chemin_actuel = tk.StringVar(value="C:/Users")
+        chemin_initial = getattr(self.affichage, "chemin", None)
+        if chemin_initial is None:
+            chemin_initial = str(Path.home())
+        self.chemin_actuel = tk.StringVar(value=chemin_initial)
         self.on_change = None  # Callback défini par le parent pour valider le changement de chemin
         self.create_widgets()
         self.grid_columnconfigure(4, weight=1)  # La colonne 4 (entrée) prend toute la largeur restante
@@ -105,37 +108,32 @@ class BarreChemin(ctk.CTkFrame):
     
     def search(self, event):
         term = self.entry1.get().strip()
-        # Appelle la méthode presearche sur l'instance d'affichage
-        # Créer et démarrer un thread pour appeler la fonction presearche
-        search_thread = Thread(target=self.affichage.presearche, args=(term,))
-        search_thread.start()
+        self.affichage.presearche(term)
     
     def copi(self, event=None):
-        Thread(target=self.affichage.cop_el()).start()
+        self.affichage.cop_el()
         
     
     def coup(self, event=None):
-        Thread(target=self.affichage.coup_el()).start()
+        self.affichage.coup_el()
         
     
     def coll(self, event=None):
-        Thread(target=self.affichage.col_el()).start()
+        self.affichage.col_el()
         
     
     def new(self, event=None):
-        Thread(target=self.affichage.add_el()).start()
+        self.affichage.add_el()
         
     
     def sup(self, event=None):
-        Thread(target=self.affichage.sup_el()).start()
+        self.affichage.sup_el()
         
     
     def on_combobox_select(self, event=None):
         # Récupérer la valeur sélectionnée
         selected_value = self.btn7.get().strip()
-        
-        # Créer un thread pour exécuter le tri et l'affichage en arrière-plan
-        Thread(target=self.affichage.trier_et_afficher, args=(selected_value.lower(),)).start()
+        self.affichage.trier_et_afficher(selected_value.lower())
         
     def func_plus(self, event):
         self.menu = tk.Menu(self.plus, tearoff=0)
@@ -163,8 +161,9 @@ class BarreChemin(ctk.CTkFrame):
 
     def update_navigation_buttons(self):
         """Met à jour l'état des boutons Précédent et Suivant."""
-        chemin_prev, existe_prev = parcours("prev")
-        chemin_next, existe_next = parcours("nexts")
+        index_courant, taille = etat_parcours()
+        existe_prev = index_courant > 0
+        existe_next = index_courant < (taille - 1)
 
         # Désactive le bouton "Précédent" si on est au début
         self.prev.configure(state="disabled" if not existe_prev else "normal")
