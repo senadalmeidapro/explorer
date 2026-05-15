@@ -54,12 +54,14 @@ class MenusContextuels:
 
     def dossier(self):
         """Crée un nouveau dossier dans le répertoire sélectionné."""
-        creer_dossier(self._repertoire_cible(), self.update_barre_callback)
+        callback = self.update_barre_callback if callable(self.update_barre_callback) else None
+        creer_dossier(self._repertoire_cible(), callback)
         self.rafraichir_callback()
 
     def fichier(self):
         """Crée un nouveau fichier dans le répertoire sélectionné."""
-        creer_fichier(self._repertoire_cible(), self.update_barre_callback)
+        callback = self.update_barre_callback if callable(self.update_barre_callback) else None
+        creer_fichier(self._repertoire_cible(), callback)
         self.rafraichir_callback()
 
     def ajouter_aux_favoris(self):

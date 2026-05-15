@@ -11,7 +11,9 @@ class BarreChemin(ctk.CTkFrame):
         """
         super().__init__(master, bg_color="white", height=40,corner_radius=0, **kwargs)
         self.affichage = affichage  # Maintenant, c'est une instance !
-        chemin_initial = getattr(self.affichage, "chemin", None) or str(Path.home())
+        chemin_initial = getattr(self.affichage, "chemin", None)
+        if chemin_initial is None:
+            chemin_initial = str(Path.home())
         self.chemin_actuel = tk.StringVar(value=chemin_initial)
         self.on_change = None  # Callback défini par le parent pour valider le changement de chemin
         self.create_widgets()
