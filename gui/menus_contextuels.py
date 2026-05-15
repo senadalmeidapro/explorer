@@ -73,6 +73,7 @@ class MenusContextuels:
         """Retire l'élément (dossier ou fichier) des favoris."""
         if self.chemin_cible in lister_favoris():
             retirer_favori(self.chemin_cible,)
-            self.affichage.afficher_favoris()
+            if self.affichage and hasattr(self.affichage, "afficher_favoris"):
+                self.affichage.afficher_favoris()
         else:
             pass
