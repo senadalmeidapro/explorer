@@ -83,3 +83,7 @@ def parcours(direction):
 
 def send_recent():
     return recents
+
+def etat_parcours():
+    """Retourne l'index courant et la taille de l'historique."""
+    return current_index, len(recents)

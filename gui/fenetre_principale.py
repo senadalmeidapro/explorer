@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from pathlib import Path
 from gui.sidebar import Sidebar
 from gui.barre_chemin import BarreChemin
 from gui.affichage_fichiers import AffichageFichiers
@@ -28,7 +29,7 @@ class FenetrePrincipale:
         self.main_frame.rowconfigure(1, weight=1)  # Affichage et sidebar prennent l'espace restant
         
         # Zone principale (ligne 1)
-        self.dir = "C:/Users"
+        self.dir = str(Path.home())
         add_recents(self.dir)
         
         # Sidebar (colonne 0, prend toute la hauteur)

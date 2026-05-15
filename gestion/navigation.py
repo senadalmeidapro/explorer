@@ -6,35 +6,34 @@ def lister_repertoire(chemin):
     """Liste le contenu du répertoire avec les informations des fichiers et dossiers."""
     try:
         contenu = []
-        for nom in os.listdir(chemin):
-            chemin_complet = os.path.join(chemin, nom)
-            if os.path.isdir(chemin_complet):
-                # Récupérer la date de création et de modification du dossier
-                date_creation = os.path.getctime(chemin_complet)
-                date_creation = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(date_creation))
-                date_modification = os.path.getmtime(chemin_complet)
-                date_modification = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(date_modification))
-                contenu.append({
-                    "nom": nom,
-                    "type": "Dossier",
-                    "taille": "",
-                    "date_creation": date_creation,
-                    "date_modification": date_modification
-                })
-            else:
-                taille = os.path.getsize(chemin_complet)
-                # Récupérer la date de création et de modification du fichier
-                date_creation = os.path.getctime(chemin_complet)
-                date_creation = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(date_creation))
-                date_modification = os.path.getmtime(chemin_complet)
-                date_modification = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(date_modification))
-                contenu.append({
-                    "nom": nom,
-                    "type": "Fichier",
-                    "taille": f"{taille} ",
-                    "date_creation": date_creation,
-                    "date_modification": date_modification
-                })
+        with os.scandir(chemin) as entrees:
+            for entree in entrees:
+                try:
+                    stats = entree.stat(follow_symlinks=False)
+                except OSError:
+                    continue
+
+                if entree.is_dir(follow_symlinks=False):
+                    date_creation = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stats.st_ctime))
+                    date_modification = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stats.st_mtime))
+                    contenu.append({
+                        "nom": entree.name,
+                        "type": "Dossier",
+                        "taille": "",
+                        "date_creation": date_creation,
+                        "date_modification": date_modification
+                    })
+                else:
+                    taille = stats.st_size
+                    date_creation = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stats.st_ctime))
+                    date_modification = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stats.st_mtime))
+                    contenu.append({
+                        "nom": entree.name,
+                        "type": "Fichier",
+                        "taille": f"{taille} ",
+                        "date_creation": date_creation,
+                        "date_modification": date_modification
+                    })
         return contenu
     except OSError as ose:
         if ose.errno == 13:
